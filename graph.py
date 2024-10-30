@@ -7,7 +7,7 @@ from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import QTimer, QSize
 import pyqtgraph as pg
 from PlotWidget import CustomPlotWidget
-from signal import Signal
+from signal_1 import Signal
 
 
 def set_icon(button, icon_path):
