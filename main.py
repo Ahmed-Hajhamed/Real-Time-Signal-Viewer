@@ -6,9 +6,8 @@ from graph import set_icon
 from GluedGraph import GlueWindow
 from cineModeRadar import SubmarineRadar
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Image, Paragraph  # Import Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Image
 from reportlab.lib import colors
-from reportlab.lib.styles import getSampleStyleSheet  # Import getSampleStyleSheet
 
 
 class App(MainWindow):
@@ -114,14 +113,26 @@ class App(MainWindow):
         pdf_filename = QFileDialog.getSaveFileName(self, "Save PDF", "", "PDF Files (*.pdf)")[0]
         if pdf_filename:
             pdf = SimpleDocTemplate(pdf_filename, pagesize=letter,
-                                    rightMargin=50, leftMargin=50, topMargin=50, bottomMargin=50)
+                                    rightMargin=10, leftMargin=10, topMargin=10, bottomMargin=10)
 
             elements = []
 
+            logo1 = Image('logo 1.png', width=100, height=100)
+            logo2 = Image('logo 2.png', width=100, height=100)
+
+            logo_table_data = [[logo1, Spacer(10, 10), logo2]]  # Adding some space between logos
+            logo_table = Table(logo_table_data, colWidths=[100, 400, 100])  # Adjust colWidths if needed
+            elements.append(logo_table)
+
+            elements.append(Spacer(1, 20))  # Add space after the logos
+
             # Step 1: Add screenshots and statistics to PDF
             for stats in GlueWindow.statistics:
+                # Add space between image name and image
+                elements.append(Spacer(1, 25))
+
                 # Add image
-                image = Image(stats['filename'], width=300, height=200)
+                image = Image(stats['filename'], width=400, height=300)
                 elements.append(image)
 
                 # Create table data for this specific image
@@ -150,10 +161,13 @@ class App(MainWindow):
                 table.setStyle(style)
 
                 # Add space between image and table
-                elements.append(Spacer(1, 12))  # Space of 12 units before the table
+                elements.append(Spacer(1, 100))  # Space of 12 units before the table
                 # Add the table to the elements directly after the image
                 elements.append(table)
-                elements.append(Spacer(1, 20))  # More space before the next entry
+                if stats["filename"][-5] == 1 or stats["filename"] == GlueWindow.statistics[-1]['filename']:
+                    pass
+                else:
+                    elements.append(Spacer(1, 120))  # More space before the next entry
 
             # Step 6: Build the PDF
             pdf.build(elements)
