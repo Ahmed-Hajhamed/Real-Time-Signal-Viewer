@@ -1,6 +1,7 @@
 import statistics
 import sys
 import numpy as np
+from scipy.interpolate import interp1d
 import pyqtgraph as pg
 from scipy.fft import fft
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QMessageBox
@@ -23,8 +24,10 @@ class GlueWindow(QMainWindow):
 
         self.signal_1 = signal_1
         self.signal_2 = signal_2
+        self.glued_signal = None
         self.duration = 0
         self.data_y = None
+        self.overlaps = False
 
         self.setWindowTitle("Signal Interpolation")
         self.setGeometry(100, 100, 800, 600)
@@ -35,10 +38,9 @@ class GlueWindow(QMainWindow):
         self.plot_widget = pg.PlotWidget()
         self.v_layout.addWidget(self.plot_widget)
 
-        # Determine which signal is on the left and which is on the right
-        self.determine_signal_order()
+        self.check_overlap_or_gap(self.signal_1, self.signal_2)
+        self.glue_signals(self.signal_1, self.signal_2, self.overlaps)
 
-        # Fit the signals and plot them
         self.plot_signals()
 
         self.snapshot_button = QPushButton("snapshot")
@@ -63,109 +65,76 @@ class GlueWindow(QMainWindow):
         container.setLayout(self.v_layout)
         self.setCentralWidget(container)
 
-    def determine_signal_order(self):
-        """Determine left and right signals based on time."""
-        if self.signal_1[0][0] < self.signal_2[0][0]:
-            self.left_signal = self.signal_1
-            self.right_signal = self.signal_2
+
+    def check_overlap_or_gap(self, signal1, signal2):
+        """
+        Returns true if 2 signals overlap and false if there's a gap.
+        """
+        # Determine the time boundaries for each signal
+        min_time_1, max_time_1 = signal1[0][0], signal1[-1][0]
+        min_time_2, max_time_2 = signal2[0][0], signal2[-1][0]
+        
+        # Arrange signals by their minimum time points
+        if min_time_2 < min_time_1:
+            signal1, signal2 = signal2, signal1
+            min_time_1, max_time_1, min_time_2, max_time_2 = min_time_2, max_time_2, min_time_1, max_time_1
+
+        # Check for overlap or gap
+        if max_time_1 >= min_time_2:
+            self.overlaps = True
         else:
-            self.left_signal = self.signal_2
-            self.right_signal = self.signal_1
+            self.overlaps = False
 
-    def reconstruct_signal(self, signal):
-        """Reconstruct the signal using Fourier series."""
-        # Extract time and values
-        time, values = zip(*signal)
-        time = np.array(time)
-        values = np.array(values)
 
-        # Perform FFT
-        n = len(values)
-        fft_values = fft(values)
-
-        # Get significant frequencies and their amplitudes
-        freq = np.fft.fftfreq(n, d=(time[1] - time[0]))
-        significant_freqs = freq[:n // 2]  # Keep only positive frequencies
-        significant_amplitudes = np.abs(fft_values[:n // 2])  # Keep magnitudes
-        significant_phases = np.angle(fft_values[:n // 2])
-
-        return significant_freqs, significant_amplitudes, significant_phases
-
-    def fill_gap_with_fourier(self, gap_start, gap_end, num_points=100):
-        """Fill the gap using Fourier components."""
-        # Reconstruct both left and right signals
-        left_freqs, left_amplitudes, left_phases = self.reconstruct_signal(self.left_signal)
-        right_freqs, right_amplitudes, right_phases = self.reconstruct_signal(self.right_signal)
-
-        # Create time points for the gap
-        new_time_points = np.linspace(gap_start, gap_end, num_points)
-
-        # Initialize predicted values
-        predicted_values = np.zeros_like(new_time_points)
-
-        # Get the max and min amplitude from both signals
-        left_max_amplitude = max([y for x, y in self.left_signal])
-        left_min_amplitude = min([y for x, y in self.left_signal])
-        right_max_amplitude = max([y for x, y in self.right_signal])
-        right_min_amplitude = min([y for x, y in self.right_signal])
-
-        # Calculate average max and min amplitude
-        avg_max_amplitude = (left_max_amplitude + right_max_amplitude) / 2
-        avg_min_amplitude = (left_min_amplitude + right_min_amplitude) / 2
-
-        # Add sinusoidal components from both signals
-        for freq, amp, phase in zip(left_freqs, left_amplitudes, left_phases):
-            predicted_values += (amp / np.max(left_amplitudes)) * avg_max_amplitude * np.sin(2 * np.pi * freq * (new_time_points - gap_start) + phase)
-
-        for freq, amp, phase in zip(right_freqs, right_amplitudes, right_phases):
-            predicted_values += (amp / np.max(right_amplitudes)) * avg_max_amplitude * np.sin(2 * np.pi * freq * (new_time_points - gap_end) + phase)
-
-        # Rescale the predicted values to fit within the original signals' max and min amplitudes
-        predicted_values = np.clip(predicted_values, avg_min_amplitude, avg_max_amplitude)
-
-        # Rescale the predicted values to fit the range of original signals
-        predicted_values = ((predicted_values - np.min(predicted_values)) /
-                            (np.max(predicted_values) - np.min(predicted_values)) *
-                            (avg_max_amplitude - avg_min_amplitude) + avg_min_amplitude)
-
-        return new_time_points, predicted_values
-
-    def plot_signals(self):
-        # Extract time and signal values
-        time_left, values_left = zip(*self.left_signal)
-        time_right, values_right = zip(*self.right_signal)
-
-        # Check if there's a gap between the left and right signals
-        gap_exists = time_left[-1] < time_right[0]
-
-        # Plot Left Signal
-        self.plot_widget.plot(*zip(*self.left_signal), pen=pg.mkPen('b', width=2), name='Left Signal')
-
-        # Plot Right Signal
-        self.plot_widget.plot(*zip(*self.right_signal), pen=pg.mkPen('g', width=2), name='Right Signal')
-        signal_1_data_x, signal_1_data_y = zip(*self.signal_1)
-        signal_2_data_x, signal_2_data_y = zip(*self.signal_2)
-        if gap_exists:
-            # There is a real gap, so fill the gap using Fourier reconstruction
-            gap_start = time_left[-1]
-            gap_end = time_right[0]
-
-            # Fill the gap
-            new_time_points, predicted_values = self.fill_gap_with_fourier(gap_start, gap_end)
-
-            # Plot Predicted Values in the gap
-            self.plot_widget.plot(new_time_points, predicted_values, pen=pg.mkPen('r', width=2, style=pg.QtCore.Qt.DashLine), name='Predicted Values')
-
-            # Combine original signals and predicted values for smoothness
-            combined_signal = list(self.left_signal) + list(zip(new_time_points, predicted_values)) + list(self.right_signal)
-
-            # Plot Combined Signal (entire sequence for smoothness)
-            self.plot_widget.plot(*zip(*combined_signal), pen=pg.mkPen('r', width=1, style=pg.QtCore.Qt.SolidLine), name='Combined Signal')
-
-            self.duration = max(signal_1_data_x[-1], signal_2_data_x[-1]) - min(signal_1_data_x[0], signal_2_data_x[0])
-            self.data_y = list(predicted_values) + list(signal_2_data_y) + list(signal_1_data_y)
+    def glue_signals(self, signal1 , signal2, overlap):
+        # Extract time and values from each signal
+        time1, values1 = zip(*signal1)
+        time2, values2 = zip(*signal2)
+        
+        # Ensure signal1 is the earlier one in time
+        if time1[-1] > time2[0]:
+            signal1, signal2 = signal2, signal1
+            time1, values1, time2, values2 = time2, values2, time1, values1
+        
+        # If overlap exists, calculate the average in the overlapping region
+        if overlap:
+            # Find the overlapping region
+            overlap_start = max(time1[0], time2[0])
+            overlap_end = min(time1[-1], time2[-1])
+            
+            # Extract overlapping portions from both signals
+            overlap_indices1 = [i for i, t in enumerate(time1) if overlap_start <= t <= overlap_end]
+            overlap_indices2 = [i for i, t in enumerate(time2) if overlap_start <= t <= overlap_end]
+            
+            # Calculate the average in the overlapping region
+            averaged_overlap = [(time1[i], (values1[i] + values2[j]) / 2) 
+                                for i, j in zip(overlap_indices1, overlap_indices2)]
+            
+            # Concatenate the non-overlapping and averaged overlapping regions
+            self.glued_signal = list(zip(time1[:overlap_indices1[0]], values1[:overlap_indices1[0]])) \
+                        + averaged_overlap \
+                        + list(zip(time2[overlap_indices2[-1] + 1:], values2[overlap_indices2[-1] + 1:]))
+        
+        # If a gap exists, interpolate to fill in the gap
         else:
-            self.data_y =list(signal_2_data_y) + list(signal_1_data_y)
+            # Create a range of time points covering the gap
+            gap_start, gap_end = time1[-1], time2[0]
+            gap_time_points = np.linspace(gap_start, gap_end, num=50)
+            
+            # Linear interpolation for values across the gap
+            interp_func = interp1d([time1[-1], time2[0]], [values1[-1], values2[0]], kind='linear')
+            gap_values = interp_func(gap_time_points)
+            
+            # Concatenate the signals with the interpolated gap
+            self.glued_signal = list(zip(time1, values1)) \
+                        + list(zip(gap_time_points, gap_values)) \
+                        + list(zip(time2, values2))
+
+
+    def plot_signals (self):
+        self.plot_widget.plot(*zip(*self.glued_signal),pen=pg.mkPen('b', width = 2), name = 'Glued Signal')
+        glued_signal_data_x, glued_signal_data_y = zip(*self.glued_signal)
+        self.data_y =list(glued_signal_data_y)
         # Add grid and legend
         self.plot_widget.addLegend()
         self.plot_widget.showGrid(x=True, y=True)
@@ -173,6 +142,7 @@ class GlueWindow(QMainWindow):
         self.plot_widget.setLabel('bottom', 'Time')
         self.plot_widget.setTitle('Signal Interpolation')
 
+ 
     def snapshot(self):
         if (self.signal_1 or self.signal_2) is None:
             QMessageBox.warning(self, "Warning", "No signal to capture!")
