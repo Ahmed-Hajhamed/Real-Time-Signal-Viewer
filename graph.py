@@ -53,6 +53,7 @@ class Graph:
         self.is_paused = False
         self.is_off = False
         self.current_index = 0
+        self.current_index_increment = 10
         self.window_size = 100
 
         self.h_signal_name = QHBoxLayout()
@@ -158,6 +159,11 @@ class Graph:
         self.zoom_out_button.clicked.connect(self.zoom_out)
         self.zoom_out_button.setEnabled(False)
         self.v_layout_icon_button.addWidget(self.zoom_out_button)
+
+        self.speed_button = QPushButton("1X")
+        self.speed_button.clicked.connect(self.speed_signal)
+        self.speed_button.setStyleSheet(button_style)
+        self.v_layout_right_button.addWidget(self.speed_button)
 
         self.rewind_button = QPushButton("Rewind Signal")
         self.rewind_button.clicked.connect(self.rewind_signal)
@@ -329,7 +335,7 @@ class Graph:
             for signal in self.signals.values():
                 signal.update_plot(self.current_index)
 
-            self.current_index += 10
+            self.current_index += self.current_index_increment
 
             if self.is_cine_mode:
                 start_index = max(0, self.current_index - self.window_size)
@@ -372,6 +378,20 @@ class Graph:
         if current_index >= 0:
             self.combo_box.removeItem(current_index)
         self.update_placeholder_combo_box()
+
+    def speed_signal(self):
+        if self.current_index_increment == 10:
+            self.current_index_increment = 20
+            self.speed_button.setText("2X")
+        elif self.current_index_increment == 20:
+            self.current_index_increment = 40
+            self.speed_button.setText("4X")
+        elif self.current_index_increment == 40:
+            self.current_index_increment = 80
+            self.speed_button.setText("8X")
+        else:
+            self.current_index_increment = 10
+            self.speed_button.setText("1X")
 
     def off_signal(self):
         self.timer.stop()
