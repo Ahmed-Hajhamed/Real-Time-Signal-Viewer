@@ -30,8 +30,8 @@ class MainWindow(QMainWindow):
                 }
                 """
 
-        self.graph_1.move_to_another_graph_button.setText("move down")
-        self.graph_2.move_to_another_graph_button.setText("move up")
+        self.graph_1.move_to_another_graph_button.setText("Move Down")
+        self.graph_2.move_to_another_graph_button.setText("Move Up")
 
         h_layout_connect_buttons = QHBoxLayout()
 
@@ -55,7 +55,7 @@ class MainWindow(QMainWindow):
         self.play_pause_button.setEnabled(False)
         h_layout_connect_buttons.addWidget(self.play_pause_button)
 
-        self.glue_button = QPushButton("glue")
+        self.glue_button = QPushButton("Glue")
         self.glue_button.setStyleSheet(button_style)
         h_layout_connect_buttons.addWidget(self.glue_button)
 
@@ -67,6 +67,9 @@ class MainWindow(QMainWindow):
         self.Create_pdf_button.setStyleSheet(button_style)
         h_layout_connect_buttons.addWidget(self.Create_pdf_button)
 
+        self.open_online_signal_button = QPushButton("Online Signal")
+        self.open_online_signal_button.setStyleSheet(button_style)
+        h_layout_connect_buttons.addWidget(self.open_online_signal_button)
 
         container = QWidget()
 

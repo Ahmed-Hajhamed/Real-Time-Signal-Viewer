@@ -121,9 +121,9 @@ class Graph:
         set_icon(self.more_button, "icons/more.png")
         self.menu = QMenu()
 
-        self.menu.addAction("add", self.add_signal)
-        self.menu.addAction("rename", self.rename)
-        self.menu.addAction("delete", self.delete_signal)
+        self.menu.addAction("Add", self.add_signal)
+        self.menu.addAction("Rename", self.rename)
+        self.menu.addAction("Delete", self.delete_signal)
         self.more_button.setMenu(self.menu)
 
         self.h_signal_name.addWidget(self.more_button)
@@ -134,11 +134,11 @@ class Graph:
         self.color_button.setEnabled(False)
         self.v_layout_icon_button.addWidget(self.color_button)
 
-        self.move_to_another_graph_button = QPushButton("move to another graph")
+        self.move_to_another_graph_button = QPushButton("Move to Other Graph")
         self.move_to_another_graph_button.setStyleSheet(button_style)
         self.v_layout_right_button.addWidget(self.move_to_another_graph_button)
 
-        self.cine_mode_button = QPushButton("off Cine Mode")
+        self.cine_mode_button = QPushButton("Cine Mode On")
         self.cine_mode_button.clicked.connect(self.cine_mode)
         self.cine_mode_button.setStyleSheet(button_style)
         self.v_layout_right_button.addWidget(self.cine_mode_button)
@@ -170,17 +170,17 @@ class Graph:
         self.rewind_button.setStyleSheet(button_style)
         self.v_layout_right_button.addWidget(self.rewind_button)
 
-        self.view_all_button = QPushButton("view all")
+        self.view_all_button = QPushButton("View All")
         self.view_all_button.clicked.connect(self.view_all_signals)
         self.view_all_button.setStyleSheet(button_style)
         self.v_layout_right_button.addWidget(self.view_all_button)
 
-        self.visibility_checkbox = QCheckBox("hide signal")
+        self.visibility_checkbox = QCheckBox("Hide Signal")
         self.visibility_checkbox.setChecked(False)
         self.visibility_checkbox.stateChanged.connect(self.toggle_signal_visibility)
         self.v_layout_right_button.addWidget(self.visibility_checkbox)
 
-        self.off_button = QPushButton("off")
+        self.off_button = QPushButton("Off")
         self.off_button.setEnabled(False)
         self.off_button.clicked.connect(self.off_signal)
         self.off_button.setStyleSheet(button_style)
@@ -218,7 +218,7 @@ class Graph:
 
     def move_to_another_graph(self, graph):
         signal_name = self.combo_box.currentText()
-        if signal_name not in graph.signals.keys() and signal_name != "upload_file":
+        if signal_name not in graph.signals.keys() and signal_name != "Upload Signal":
             graph.add_signal(self.signals[signal_name].csv_file)
             self.delete_signal()
 
@@ -273,9 +273,9 @@ class Graph:
             pass
     def cine_mode(self):
         if self.is_cine_mode:
-            self.cine_mode_button.setText("on Cine Mode ")
+            self.cine_mode_button.setText("Cine Mode Off")
         else:
-            self.cine_mode_button.setText("off Cine Mode ")
+            self.cine_mode_button.setText("Cine Mode On")
 
         self.is_cine_mode = not self.is_cine_mode
 
@@ -366,11 +366,11 @@ class Graph:
 
     def update_placeholder_combo_box(self):
         if self.combo_box.count() == 0:
-            self.combo_box.addItem("upload_file")
+            self.combo_box.addItem("Upload Signal")
             self.combo_box.setEnabled(False)
         else:
             self.combo_box.setEnabled(True)
-            if self.combo_box.itemText(0) == "upload_file":
+            if self.combo_box.itemText(0) == "Upload Signal":
                 self.combo_box.removeItem(0)
 
     def remove_selected_item(self):

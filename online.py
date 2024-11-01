@@ -1,5 +1,4 @@
 import sys
-import numpy as np
 import requests
 from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtCore import QTimer
@@ -48,18 +47,20 @@ class BTCPricePlotter(QMainWindow):
         price = self.fetch_btc_price()
         if price is not None:
 
-            self.x_data.append(len(self.x_data))
+            self.x_data.append(self.x_data[-1] + 1 if len(self.x_data) > 0 else 0)
+
             self.y_data.append(price)
-            print(price)
+
 
             self.curve.setData(self.x_data, self.y_data)
-
+            self.plot_widget.setLabel('left', 'BTC Price', units='US $')
+            self.plot_widget.setLabel('bottom', 'time ', units='sec')
             if len(self.x_data) > 60:
                 self.x_data.pop(0)
                 self.y_data.pop(0)
 
-            self.plot_widget.setXRange(max(0, len(self.x_data) - 60), len(self.x_data))
-            self.plot_widget.setYRange(min(self.y_data) * 0.99, max(self.y_data) * 1.01)
+            self.plot_widget.setXRange(max(0, len(self.x_data) - self.x_data[-1]), self.x_data[-1])
+            self.plot_widget.setYRange(min(self.y_data), max(self.y_data))
 
 
 if __name__ == "__main__":

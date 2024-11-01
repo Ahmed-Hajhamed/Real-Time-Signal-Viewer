@@ -6,6 +6,7 @@ from graph import set_icon
 from GluedGraph import GlueWindow
 from cineModeRadar import SubmarineRadar
 from reportlab.lib.pagesizes import letter
+from online import BTCPricePlotter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Image
 from reportlab.lib import colors
 
@@ -42,9 +43,15 @@ class App(MainWindow):
 
         self.Create_pdf_button.clicked.connect(self.create_pdf)
 
+        self.open_online_signal_button.clicked.connect(self.online_signal_window)
+
     def radar_window(self):
         self.radar_win = SubmarineRadar()
         self.radar_win.show()
+
+    def online_signal_window(self):
+        self.online_signal_win = BTCPricePlotter()
+        self.online_signal_win.show()
 
     def glue_window(self):
         if self.graph_1.selected_data and self.graph_2.selected_data:
