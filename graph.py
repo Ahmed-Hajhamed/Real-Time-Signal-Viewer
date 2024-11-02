@@ -220,8 +220,8 @@ class Graph(QObject):
         signal_name = self.combo_box.currentText()
         if signal_name != "Upload Signal":
             number_of_signals = len(graph.signals)  # to check if is added to delet from the graph
-            graph.add_signal(graph.signals[signal_name].csv_file)
-            if len(self.signals) > number_of_signals:
+            graph.add_signal(self.signals[signal_name].csv_file)
+            if len(graph.signals) > number_of_signals:
                 self.delete_signal()
 
     def toggle_signal_visibility(self):
