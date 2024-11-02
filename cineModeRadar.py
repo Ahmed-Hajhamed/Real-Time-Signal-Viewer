@@ -209,27 +209,6 @@ class SubmarineRadar(QMainWindow):
             except Exception as e:
                 print(f"Error loading CSV: {e}")
 
-    # def load_default_csv(self):
-    #     """Load the default CSV file on startup."""
-    #     try:
-    #         data = pd.read_csv(self.default_csv_file_path)
-    #
-    #         # Clear previous objects
-    #         self.objects.clear()
-    #
-    #         # Ensure the CSV has the correct columns
-    #         if 'r' in data.columns and 'theta' in data.columns:
-    #             for index, row in data.iterrows():
-    #                 r = row['r']
-    #                 theta = np.radians(row['theta'])  # Convert degrees to radians
-    #                 self.objects.append((r, theta))
-    #
-    #             # Update the radar with the loaded objects
-    #             self.update_radar()
-    #         else:
-    #             print("CSV must contain 'r' and 'theta' columns.")
-    #     except Exception as e:
-    #         print(f"Error loading default CSV: {e}")
 
     def toggle_radar(self):
         """Start or pause the radar based on the current state."""
