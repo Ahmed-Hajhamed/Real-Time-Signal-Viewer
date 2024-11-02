@@ -4,7 +4,7 @@ import numpy as np
 from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QPushButton, QComboBox, QLabel, QDialog,
                              QFileDialog, QColorDialog, QCheckBox, QMenu, QLineEdit, QMessageBox)
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import QTimer, QSize
+from PyQt5.QtCore import QTimer, QSize, QObject
 import pyqtgraph as pg
 from PlotWidget import CustomPlotWidget
 from signal_1 import Signal
@@ -42,9 +42,9 @@ class NameInputDialog(QDialog):
         return self.name_input.text()
 
 
-class Graph:
+class Graph(QObject):
     def __init__(self):
-
+        super().__init__()
         self.signals = dict()
         self.screenshots = []
         self.statistics = []
@@ -192,7 +192,7 @@ class Graph:
         self.v_layout_button.addLayout(self.h_buttons_layout)
         self.h_layout.addLayout(self.v_layout_button)
 
-        self.timer = QTimer()
+        self.timer = QTimer(self)
         self.timer.setInterval(100)  # Update every 100ms
         self.timer.timeout.connect(self.update_plot_graph)
 
@@ -218,9 +218,11 @@ class Graph:
 
     def move_to_another_graph(self, graph):
         signal_name = self.combo_box.currentText()
-        if signal_name not in graph.signals.keys() and signal_name != "Upload Signal":
+        if signal_name != "Upload Signal":
+            number_of_signals = len(self.signals)  # to check if is added to delet from the graph
             graph.add_signal(self.signals[signal_name].csv_file)
-            self.delete_signal()
+            if len(self.signals) > number_of_signals:
+                self.delete_signal()
 
     def toggle_signal_visibility(self):
         signal_name = self.combo_box.currentText()
@@ -245,32 +247,32 @@ class Graph:
 
         if csv_file and signal_name not in self.signals.keys():
             color = self.colors[len(self.signals) % len(self.colors)]
-
+            check = True
             signal = Signal(self.plot_widget, color, name=signal_name, csv_file=csv_file)
-            # for signal_on_graph in self.signals.values():
-            #     if signal.y_data.size == signal_on_graph.y_data.size:
-            #         if np.array_equal(signal.y_data, signal_on_graph.y_data):
-            #             QMessageBox.warning(None, "Input Error", "Data already exist")
-            #             break
-            #         else:
-            #             QMessageBox.warning(None, "Input Info", "Data has the same size but different values.")
-            #             break
-            self.combo_box.addItem(signal.name, False)
-            self.update_placeholder_combo_box()
-            self.signals[signal.name] = signal
+            for signal_on_graph in self.signals.values():
+                if signal.y_data.size == signal_on_graph.y_data.size and np.array_equal(signal.y_data, signal_on_graph.y_data):
+                    # if np.array_equal(signal.y_data, signal_on_graph.y_data):
+                    QMessageBox.warning(None, "Input Error", "Data already exist")
+                    check = False
+                    break
 
-            self.set_plot_limits()
-            set_icon(self.play_pause_button, "icons/pause.png")
-            self.off_button.setEnabled(True)
-            self.zoom_in_button.setEnabled(True)
-            self.zoom_out_button.setEnabled(True)
-            self.color_button.setEnabled(True)
-            self.move_to_another_graph_button.setEnabled(True)
+            if check:
+                self.combo_box.addItem(signal.name, False)
+                self.update_placeholder_combo_box()
+                self.signals[signal.name] = signal
 
-            self.timer.start()
+                self.set_plot_limits()
+                set_icon(self.play_pause_button, "icons/pause.png")
+                self.off_button.setEnabled(True)
+                self.zoom_in_button.setEnabled(True)
+                self.zoom_out_button.setEnabled(True)
+                self.color_button.setEnabled(True)
+                self.move_to_another_graph_button.setEnabled(True)
+
+                self.timer.start()
         else:
             QMessageBox.warning(None, "Input Error", f"A signal with the name '{signal_name}' already exists.")
-            pass
+
     def cine_mode(self):
         if self.is_cine_mode:
             self.cine_mode_button.setText("Cine Mode Off")

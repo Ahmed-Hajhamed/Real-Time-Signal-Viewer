@@ -4,9 +4,22 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget
 from PyQt5.QtCore import QTimer
 import pyqtgraph as pg
 
+
+def fetch_btc_price():
+    """Fetch the current BTC price from Binance."""
+    try:
+        response = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT")
+        data = response.json()
+        price = float(data['price'])
+        return price
+    except Exception as e:
+        print(f"Error fetching price: {e}")
+        return None
+
+
 class BTCPricePlotter(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
 
         self.setWindowTitle("Live BTC Price Plot")
         self.setGeometry(100, 100, 800, 600)
@@ -23,34 +36,21 @@ class BTCPricePlotter(QMainWindow):
         self.x_data = []
         self.y_data = []
 
-
         self.curve = self.plot_widget.plot(pen='b')
 
-
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_plot)
-        self.timer.start(100)
-
-    def fetch_btc_price(self):
-        """Fetch the current BTC price from Binance."""
-        try:
-            response = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT")
-            data = response.json()
-            price = float(data['price'])
-            return price
-        except Exception as e:
-            print(f"Error fetching price: {e}")
-            return None
+        self.timer_online = QTimer(self)
+        self.timer_online.setInterval(500)
+        self.timer_online.timeout.connect(self.update_plot)
+        self.timer_online.start()
 
     def update_plot(self):
 
-        price = self.fetch_btc_price()
+        price = fetch_btc_price()
         if price is not None:
 
             self.x_data.append(self.x_data[-1] + 1 if len(self.x_data) > 0 else 0)
 
             self.y_data.append(price)
-
 
             self.curve.setData(self.x_data, self.y_data)
             self.plot_widget.setLabel('left', 'BTC Price', units='US $')
@@ -61,6 +61,10 @@ class BTCPricePlotter(QMainWindow):
 
             self.plot_widget.setXRange(max(0, len(self.x_data) - self.x_data[-1]), self.x_data[-1])
             self.plot_widget.setYRange(min(self.y_data), max(self.y_data))
+
+    def closeEvent(self, event):
+        self.timer_online.stop()
+        event.accept()
 
 
 if __name__ == "__main__":

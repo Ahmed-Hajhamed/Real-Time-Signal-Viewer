@@ -15,6 +15,7 @@ class App(MainWindow):
     def __init__(self):
         super().__init__()
 
+        self.online_signal_win = None
         self.radar_win = None
         self.glue_window_object = None
         self.connected_graphs = False
@@ -50,7 +51,7 @@ class App(MainWindow):
         self.radar_win.show()
 
     def online_signal_window(self):
-        self.online_signal_win = BTCPricePlotter()
+        self.online_signal_win = BTCPricePlotter(self)
         self.online_signal_win.show()
 
     def glue_window(self):

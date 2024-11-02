@@ -9,8 +9,8 @@ import pandas as pd
 
 
 class SubmarineRadar(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self,parent=None):
+        super().__init__(parent)
 
         # Set up the main window and plot widget
         self.setWindowTitle("Enhanced Real-Time Submarine Radar")
