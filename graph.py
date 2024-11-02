@@ -239,14 +239,15 @@ class Graph(QObject):
         # Set the view to fit all the plotted signals
         self.plot_widget.plotItem.vb.autoRange()
 
-    def add_signal(self, csv_file=None):
+    def add_signal(self, csv_file=None ,color=None):
         # Open a file dialog to select a CSV file
         if csv_file is None:
             csv_file, _ = QFileDialog.getOpenFileName(None, "Open CSV File", "", "CSV Files (*.csv)")
         signal_name = os.path.splitext(os.path.basename(csv_file))[0]
 
         if csv_file and signal_name not in self.signals.keys():
-            color = self.colors[len(self.signals) % len(self.colors)]
+            if color is None:
+                color = self.colors[len(self.signals) % len(self.colors)]
             check = True
             signal = Signal(self.plot_widget, color, name=signal_name, csv_file=csv_file)
             for signal_on_graph in self.signals.values():
@@ -414,7 +415,7 @@ class Graph(QObject):
         self.color_button.setEnabled(False)
         self.move_to_another_graph_button.setEnabled(False)
 
-        self.plot_widget.setLimits(xMin=0, xMax=2, yMin=-2, yMax=2)
+        self.plot_widget.setLimits(xMin=0, xMax=0, yMin=0, yMax=0)
 
     def play_pause_signal(self):
         if self.is_paused:

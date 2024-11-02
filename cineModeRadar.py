@@ -9,7 +9,7 @@ import pandas as pd
 
 
 class SubmarineRadar(QMainWindow):
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         super().__init__(parent)
 
         # Set up the main window and plot widget
@@ -307,6 +307,7 @@ def radar_window():
     window = SubmarineRadar()
     window.show()
     sys.exit(radar_win.exec_())
+
 
 if __name__=="__main__":
     radar_window()

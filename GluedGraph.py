@@ -4,7 +4,7 @@ import numpy as np
 from scipy.interpolate import interp1d
 import pyqtgraph as pg
 from scipy.fft import fft
-from PyQt5.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QMessageBox
 
 
 def calculate_statistics_data(amplitude):
@@ -65,7 +65,6 @@ class GlueWindow(QMainWindow):
         container.setLayout(self.v_layout)
         self.setCentralWidget(container)
 
-
     def check_overlap_or_gap(self, signal1, signal2):
         """
         Returns true if 2 signals overlap and false if there's a gap.
@@ -84,7 +83,6 @@ class GlueWindow(QMainWindow):
             self.overlaps = True
         else:
             self.overlaps = False
-
 
     def glue_signals(self, signal1 , signal2, overlap):
         # Extract time and values from each signal
@@ -130,10 +128,11 @@ class GlueWindow(QMainWindow):
                         + list(zip(gap_time_points, gap_values)) \
                         + list(zip(time2, values2))
 
-
     def plot_signals (self):
         self.plot_widget.plot(*zip(*self.glued_signal),pen=pg.mkPen('b', width = 2), name = 'Glued Signal')
         glued_signal_data_x, glued_signal_data_y = zip(*self.glued_signal)
+        self.duration = glued_signal_data_x[-1] - glued_signal_data_x[0]
+
         self.data_y =list(glued_signal_data_y)
         # Add grid and legend
         self.plot_widget.addLegend()
@@ -142,7 +141,6 @@ class GlueWindow(QMainWindow):
         self.plot_widget.setLabel('bottom', 'Time')
         self.plot_widget.setTitle('Signal Interpolation')
 
- 
     def snapshot(self):
         if (self.signal_1 or self.signal_2) is None:
             QMessageBox.warning(self, "Warning", "No signal to capture!")
