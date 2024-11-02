@@ -39,7 +39,7 @@ class BTCPricePlotter(QMainWindow):
         self.curve = self.plot_widget.plot(pen='b')
 
         self.timer_online = QTimer(self)
-        self.timer_online.setInterval(500)
+        self.timer_online.setInterval(1000)
         self.timer_online.timeout.connect(self.update_plot)
         self.timer_online.start()
 
