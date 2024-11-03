@@ -17,10 +17,10 @@ class SubmarineRadar(QMainWindow):
         self.setStyleSheet("background-color: #1e1e1e; color: white;")  # Dark theme
 
         self.plot_widget = pg.PlotWidget()
-        self.plot_widget.setAspectLocked(True)  # To maintain circular aspect ratio
-        self.plot_widget.setBackground('k')  # Radar background to black
+        self.plot_widget.setAspectLocked(True) 
+        self.plot_widget.setBackground('k')
 
-        # Set radar limits (radius from 0 to 1000 units)
+
         self.plot_widget.setXRange(-1000, 1000)
         self.plot_widget.setYRange(-1000, 1000)
 
@@ -68,7 +68,7 @@ class SubmarineRadar(QMainWindow):
         # Create a button for loading a CSV file
         self.load_button = QPushButton("Load CSV File")
         self.load_button.setStyleSheet(button_style)
-        self.load_button.clicked.connect(self.load_csv)
+        self.load_button.clicked.connect(lambda:self.load_csv())
         button_layout.addWidget(self.load_button)
 
         # Add a button for Cine-Mode
@@ -106,13 +106,12 @@ class SubmarineRadar(QMainWindow):
         self.scatter = pg.ScatterPlotItem(size=10, pen=pg.mkPen(None), brush=pg.mkBrush(255, 255, 0, 255))
         self.plot_widget.addItem(self.scatter)
 
-        # Timer for updating the plot (real-time updates and cine-mode)
         self.timer = QTimer()
-        self.timer.setInterval(100)  # Update interval in milliseconds
+        self.timer.setInterval(100) 
         self.timer.timeout.connect(self.update_display)
 
-        self.num_objects = 10  # Number of objects to detect
-        self.objects = []  # List of (r, theta) tuples representing objects
+        self.num_objects = 10  
+        self.objects = []  
 
         # Initialize current_color with a default color
         self.current_color = (255, 255, 0, 255)  # Default color for radar blips
@@ -143,10 +142,10 @@ class SubmarineRadar(QMainWindow):
         y = radius * np.sin(theta)  # Y coordinates of the circle
         self.plot_widget.plot(x, y, pen=pg.mkPen('w', width=2))  # Plot the circle in white
 
-    def generate_random_object(self):
+    def generate_objects(self):
         """Generate random object positions in polar coordinates (r, theta)."""
-        radius = random.uniform(100, self.max_radius)  # Random radius between 100 and max_radius
-        theta = random.uniform(0, 2 * np.pi)  # Random angle between 0 and 360 degrees
+        radius = random.uniform(100, self.max_radius)  
+        theta = random.uniform(0, 2 * np.pi)  
         return radius, theta
 
     def update_display(self):
@@ -163,16 +162,15 @@ class SubmarineRadar(QMainWindow):
 
         # Generate new objects
         for _ in range(self.num_objects):
-            r, theta = self.generate_random_object()
+            r, theta = self.generate_objects()
             self.objects.append((r, theta))
 
-        # Convert polar to Cartesian coordinates
         x_data = [r * np.cos(theta) for r, theta in self.objects]
         y_data = [r * np.sin(theta) for r, theta in self.objects]
 
         # Update the scatter plot with the new object positions
         spots = [{'pos': (x, y)} for x, y in zip(x_data, y_data)]
-        self.scatter.setData(spots, brush=pg.mkBrush(*self.current_color))  # Use the current color for blips
+        self.scatter.setData(spots, brush=pg.mkBrush(*self.current_color))  
 
     def update_cine_mode(self):
         """Update the radar display in cine-mode."""
@@ -186,7 +184,7 @@ class SubmarineRadar(QMainWindow):
     def load_csv(self, file_name=None):
         """Load CSV data for r and theta."""
         if file_name is None:
-            file_name, _ = QFileDialog.getOpenFileName(self, "Open CSV File", "", "CSV Files (*.csv)")
+            file_name, _ = QFileDialog.getOpenFileName(None, "Open CSV File", "", "CSV Files (*.csv)")
         if file_name:
             try:
                 # Load the CSV file into a DataFrame
