@@ -94,7 +94,7 @@ class GlueWindow(QMainWindow):
             signal1, signal2 = signal2, signal1
             time1, values1, time2, values2 = time2, values2, time1, values1
         
-        # If overlap exists, calculate the average in the overlapping region
+
         if overlap:
             # Find the overlapping region
             overlap_start = max(time1[0], time2[0])
@@ -113,7 +113,7 @@ class GlueWindow(QMainWindow):
                         + averaged_overlap \
                         + list(zip(time2[overlap_indices2[-1] + 1:], values2[overlap_indices2[-1] + 1:]))
         
-        # If a gap exists, interpolate to fill in the gap
+
         else:
             # Create a range of time points covering the gap
             gap_start, gap_end = time1[-1], time2[0]
@@ -134,7 +134,7 @@ class GlueWindow(QMainWindow):
         self.duration = glued_signal_data_x[-1] - glued_signal_data_x[0]
 
         self.data_y =list(glued_signal_data_y)
-        # Add grid and legend
+
         self.plot_widget.addLegend()
         self.plot_widget.showGrid(x=True, y=True)
         self.plot_widget.setLabel('left', 'Signal Value')

@@ -51,6 +51,8 @@ class App(MainWindow):
 
     def radar_window(self):
         self.radar_win = SubmarineRadar(self)
+        # self.default_csv_file_path = "file_of_signal/radarEXSheet1(1).csv"
+        # self.radar_win.load_csv(self.default_csv_file_path) 
         self.radar_win.show()
 
     def online_signal_window(self):
