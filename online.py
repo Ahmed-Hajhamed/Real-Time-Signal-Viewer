@@ -8,10 +8,16 @@ import pyqtgraph as pg
 def fetch_btc_price():
     """Fetch the current BTC price from Binance."""
     try:
-        response = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT")
+        # "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
+        # lat = 30.0444
+        # lon = 31.2357
+        # api_key = "9a4c014a085132d244fe6c7157a576d2"
+        url = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
+        response = requests.get(url)
         data = response.json()
-        price = float(data['price'])
-        return price
+        price = data
+        print(price)
+        return None
     except Exception as e:
         print(f"Error fetching price: {e}")
         return None
