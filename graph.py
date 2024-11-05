@@ -214,12 +214,12 @@ class Graph:
                 mask = (signal.x_data >= min_x) & (signal.x_data <= max_x)
                 selected_x = signal.x_data[mask]
                 selected_y = signal.y_data[mask]
-                self.selected_data = list(zip(selected_x, selected_y))  # Store selected data as (x, y) tuples
+                self.selected_data = list(zip(selected_x, selected_y))  
 
     def move_to_another_graph(self, graph):
         signal_name = self.combo_box.currentText()
         if signal_name != "Upload Signal":
-            number_of_signals = len(graph.signals)  # to check if is added to delet from the graph
+            number_of_signals = len(graph.signals) 
             graph.add_signal(self.signals[signal_name].csv_file)
             if len(graph.signals) > number_of_signals:
                 self.delete_signal()
