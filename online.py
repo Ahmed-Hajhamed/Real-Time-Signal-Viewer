@@ -8,16 +8,10 @@ import pyqtgraph as pg
 def fetch_btc_price():
     """Fetch the current BTC price from Binance."""
     try:
-        # "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
-        # lat = 30.0444
-        # lon = 31.2357
-        # api_key = "9a4c014a085132d244fe6c7157a576d2"
-        url = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
-        response = requests.get(url)
+        response = requests.get("https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT")
         data = response.json()
-        price = data
-        print(price)
-        return None
+        price = float(data['price'])
+        return price
     except Exception as e:
         print(f"Error fetching price: {e}")
         return None
@@ -45,6 +39,7 @@ class BTCPricePlotter(QMainWindow):
         self.curve = self.plot_widget.plot(pen='b')
 
         self.timer_online = QTimer(self)
+        self.timer_online.setInterval(500)
         self.timer_online.setInterval(1000)
         self.timer_online.timeout.connect(self.update_plot)
         self.timer_online.start()
