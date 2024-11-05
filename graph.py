@@ -4,7 +4,7 @@ import numpy as np
 from PyQt5.QtWidgets import (QVBoxLayout, QHBoxLayout, QPushButton, QComboBox, QLabel, QDialog,
                              QFileDialog, QColorDialog, QCheckBox, QMenu, QLineEdit, QMessageBox)
 from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import QTimer, QSize, QObject
+from PyQt5.QtCore import QTimer, QSize
 import pyqtgraph as pg
 from PlotWidget import CustomPlotWidget
 from signal_1 import Signal
@@ -42,7 +42,7 @@ class NameInputDialog(QDialog):
         return self.name_input.text()
 
 
-class Graph(QObject):
+class Graph:
     def __init__(self):
         super().__init__()
         self.signals = dict()
@@ -192,7 +192,7 @@ class Graph(QObject):
         self.v_layout_button.addLayout(self.h_buttons_layout)
         self.h_layout.addLayout(self.v_layout_button)
 
-        self.timer = QTimer(self)
+        self.timer = QTimer()
         self.timer.setInterval(100)  # Update every 100ms
         self.timer.timeout.connect(self.update_plot_graph)
 
@@ -239,7 +239,7 @@ class Graph(QObject):
         # Set the view to fit all the plotted signals
         self.plot_widget.plotItem.vb.autoRange()
 
-    def add_signal(self, csv_file=None ,color=None):
+    def add_signal(self, csv_file=None, color=None):
         # Open a file dialog to select a CSV file
         if csv_file is None:
             csv_file, _ = QFileDialog.getOpenFileName(None, "Open CSV File", "", "CSV Files (*.csv)")

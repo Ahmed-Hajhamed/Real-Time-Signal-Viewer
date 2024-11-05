@@ -19,7 +19,7 @@ class App(MainWindow):
         self.radar_win = None
         self.glue_window_object = None
         self.connected_graphs = False
-        self.connected_graphs_toggle = False
+        self.connected_graphs_toggle = True
 
         self.graph_1.move_to_another_graph_button.clicked.connect(
             lambda: self.graph_1.move_to_another_graph(self.graph_2))
@@ -51,8 +51,6 @@ class App(MainWindow):
 
     def radar_window(self):
         self.radar_win = SubmarineRadar(self)
-        # self.default_csv_file_path = "file_of_signal/radarEXSheet1(1).csv"
-        # self.radar_win.load_csv(self.default_csv_file_path) 
         self.radar_win.show()
 
     def online_signal_window(self):
@@ -102,6 +100,27 @@ class App(MainWindow):
             self.graph_2.play_pause_button.setEnabled(True)
 
         self.connected_graphs = not self.connected_graphs
+        self.set()
+
+    def set(self):
+        if self.connected_graphs:
+            self.graph_1.is_paused = True
+            self.graph_2.is_paused = True
+            self.connected_graphs_toggle = True
+            self.graph_1.timer.stop()
+            self.graph_2.timer.stop()
+            set_icon(self.graph_1.play_pause_button, "icons/play.png")
+            set_icon(self.graph_2.play_pause_button, "icons/play.png")
+            set_icon(self.play_pause_button, "icons/play")
+        else:
+            self.graph_1.is_paused = False
+            self.graph_2.is_paused = False
+            self.connected_graphs_toggle = False
+            self.graph_1.timer.start()
+            self.graph_2.timer.start()
+            set_icon(self.graph_1.play_pause_button, "icons/pause.png")
+            set_icon(self.graph_2.play_pause_button, "icons/pause.png")
+            set_icon(self.play_pause_button, "icons/pause.png")
 
     def zoom_in_graphs(self):
         self.graph_1.zoom_in()

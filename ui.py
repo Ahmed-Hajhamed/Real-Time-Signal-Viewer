@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         h_layout_connect_buttons.addWidget(self.zoom_out_connect_graphs)
 
         self.play_pause_button = QPushButton()
-        set_icon(self.play_pause_button, "icons/pause.png")
+        set_icon(self.play_pause_button, "icons/play.png")
         self.play_pause_button.setEnabled(False)
         h_layout_connect_buttons.addWidget(self.play_pause_button)
 
