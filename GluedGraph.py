@@ -69,9 +69,11 @@ class GlueWindow(QMainWindow):
         """
         Returns true if 2 signals overlap and false if there's a gap.
         """
+        # Determine the time boundaries for each signal
         min_time_1, max_time_1 = signal1[0][0], signal1[-1][0]
         min_time_2, max_time_2 = signal2[0][0], signal2[-1][0]
         
+        # Arrange signals by their minimum time points
         if min_time_2 < min_time_1:
             signal1, signal2 = signal2, signal1
             min_time_1, max_time_1, min_time_2, max_time_2 = min_time_2, max_time_2, min_time_1, max_time_1
@@ -83,44 +85,45 @@ class GlueWindow(QMainWindow):
             self.overlaps = False
 
     def glue_signals(self, signal1 , signal2, overlap):
-        
+        # Extract time and values from each signal
         time1, values1 = zip(*signal1)
         time2, values2 = zip(*signal2)
         
+        # Ensure signal1 is the earlier one in time
         if time1[-1] > time2[0]:
             signal1, signal2 = signal2, signal1
             time1, values1, time2, values2 = time2, values2, time1, values1
         
 
         if overlap:
-            
+            # Find the overlapping region
             overlap_start = max(time1[0], time2[0])
             overlap_end = min(time1[-1], time2[-1])
             
- 
+            # Extract overlapping portions from both signals
             overlap_indices1 = [i for i, t in enumerate(time1) if overlap_start <= t <= overlap_end]
             overlap_indices2 = [i for i, t in enumerate(time2) if overlap_start <= t <= overlap_end]
             
-
+            # Calculate the average in the overlapping region
             averaged_overlap = [(time1[i], (values1[i] + values2[j]) / 2) 
                                 for i, j in zip(overlap_indices1, overlap_indices2)]
             
-
+            # Concatenate the non-overlapping and averaged overlapping regions
             self.glued_signal = list(zip(time1[:overlap_indices1[0]], values1[:overlap_indices1[0]])) \
                         + averaged_overlap \
                         + list(zip(time2[overlap_indices2[-1] + 1:], values2[overlap_indices2[-1] + 1:]))
         
 
         else:
-
+            # Create a range of time points covering the gap
             gap_start, gap_end = time1[-1], time2[0]
             gap_time_points = np.linspace(gap_start, gap_end, num=50)
             
-
+            # Linear interpolation for values across the gap
             interp_func = interp1d([time1[-1], time2[0]], [values1[-1], values2[0]], kind='linear')
             gap_values = interp_func(gap_time_points)
             
-
+            # Concatenate the signals with the interpolated gap
             self.glued_signal = list(zip(time1, values1)) \
                         + list(zip(gap_time_points, gap_values)) \
                         + list(zip(time2, values2))
