@@ -2,8 +2,9 @@ import statistics
 import numpy as np
 from scipy.interpolate import interp1d
 import pyqtgraph as pg
-from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QMessageBox
-
+from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QMessageBox, QLabel, QSlider
+from PyQt5.QtCore import Qt
+import pyqtgraph as pg
 
 def calculate_statistics_data(amplitude):
     mean = statistics.mean(amplitude)
@@ -26,6 +27,8 @@ class GlueWindow(QMainWindow):
         self.duration = 0
         self.data_y = None
         self.overlaps = False
+        self.gap_length = 0
+
 
         self.setWindowTitle("Signal Interpolation")
         self.setGeometry(100, 100, 800, 600)
@@ -58,7 +61,17 @@ class GlueWindow(QMainWindow):
                 }
                 """)
         self.v_layout.addWidget(self.snapshot_button)
+        # Create a label and slider for adjusting the gap/overlap length
+        self.slider_label = QLabel('Gap/Overlap Length: 0')
+        self.v_layout.addWidget(self.slider_label)
 
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setMinimum(-50)  # Negative values for overlap, positive for a gap
+        self.slider.setMaximum(50)
+        self.slider.setValue(0)
+        self.slider.setTickInterval(1)
+        self.slider.valueChanged.connect(self.update_gap_length)
+        self.v_layout.addWidget(self.slider)
         container = QWidget()
         container.setLayout(self.v_layout)
         self.setCentralWidget(container)
@@ -84,6 +97,7 @@ class GlueWindow(QMainWindow):
 
     def glue_signals(self, signal1 , signal2, overlap):
         # Extract time and values from each signal
+        signal1, signal2 = self.adjust_signal_positions(self.signal_1, self.signal_2, self.gap_length)
         time1, values1 = zip(*signal1)
         time2, values2 = zip(*signal2)
         
@@ -126,8 +140,29 @@ class GlueWindow(QMainWindow):
                         + list(zip(gap_time_points, gap_values)) \
                         + list(zip(time2, values2))
 
+    def update_gap_length(self, value):
+        """Callback for slider to update the gap/overlap length and re-plot the signals."""
+        self.gap_length = value
+        self.slider_label.setText(f'Gap/Overlap Length: {value}')
+        self.plot_signals()
+        
+
+    def adjust_signal_positions(self, signal1, signal2, gap_length):
+        """Adjusts the starting position of signal2 based on the gap/overlap length."""
+        time1, values1 = zip(*signal1)
+        time2, values2 = zip(*signal2)
+
+        # Adjust time of the second signal based on the gap/overlap length
+        shift_amount = time1[-1] + gap_length - time2[0]
+        adjusted_time2 = [t + shift_amount for t in time2]
+
+        adjusted_signal2 = list(zip(adjusted_time2, values2))
+        return signal1, adjusted_signal2
+
     def plot_signals (self):
-        self.plot_widget.plot(*zip(*self.glued_signal),pen=pg.mkPen('b', width = 2), name = 'Glued Signal')
+        self.plot_widget.clear()
+        self.glue_signals(self.signal_1, self.signal_2, self.overlaps)
+        self.plot_widget.plot(*zip(*self.glued_signal),pen=pg.mkPen('b', width = 2))
         glued_signal_data_x, glued_signal_data_y = zip(*self.glued_signal)
         self.duration = glued_signal_data_x[-1] - glued_signal_data_x[0]
 
