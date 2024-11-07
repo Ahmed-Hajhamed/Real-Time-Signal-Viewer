@@ -21,6 +21,9 @@ class GlueWindow(QMainWindow):
         self.signal_2 = np.array(signal_2)
         self.original_signal_2 = np.copy(self.signal_2)  # Store the original for reference
         self.glued_signal = None
+        self.first_signal = None
+        self.second_signl = None
+        self.middle_region = None
         self.duration = 0
         self.data_y = None
         self.overlaps = False
@@ -127,6 +130,9 @@ class GlueWindow(QMainWindow):
             self.glued_signal = list(zip(time1[:overlap_indices1[0]], values1[:overlap_indices1[0]])) \
                         + averaged_overlap \
                         + list(zip(time2[overlap_indices2[-1] + 1:], values2[overlap_indices2[-1] + 1:]))
+            self.first_signal = list(zip(time1[:overlap_indices1[0]], values1[:overlap_indices1[0]]))
+            self.second_signl = averaged_overlap
+            self.middle_region = list(zip(time1[:overlap_indices1[0]], values1[:overlap_indices1[0]]))
         
 
         else:
@@ -142,9 +148,17 @@ class GlueWindow(QMainWindow):
             self.glued_signal = list(zip(time1, values1)) \
                         + list(zip(gap_time_points, gap_values)) \
                         + list(zip(time2, values2))
+            self.first_signal = list(zip(time1, values1)) 
+            self.second_signl = list(zip(gap_time_points, gap_values))
+            self.middle_region = list(zip(time2, values2))
 
     def plot_signals (self):
-        self.plot_widget.plot(*zip(*self.glued_signal),pen=pg.mkPen('b', width = 2), name = 'Glued Signal')
+        # self.plot_widget.plot(*zip(*self.glued_signal),pen=pg.mkPen('b', width = 2))
+        self.plot_widget.plot(*zip(*self.first_signal),pen=pg.mkPen('b', width = 2))
+        self.plot_widget.plot(*zip(*self.second_signl),pen=pg.mkPen('white', width = 2) )
+        self.plot_widget.plot(*zip(*self.middle_region),pen=pg.mkPen('r', width = 2))
+
+
         glued_signal_data_x, glued_signal_data_y = zip(*self.glued_signal)
         self.duration = glued_signal_data_x[-1] - glued_signal_data_x[0]
 
