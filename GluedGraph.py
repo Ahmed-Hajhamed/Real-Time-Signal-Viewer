@@ -7,7 +7,12 @@ from scipy.fft import fft
 from PyQt5.QtWidgets import QMainWindow, QVBoxLayout, QWidget, QPushButton, QMessageBox, QSlider, QLabel
 from PyQt5.QtCore import Qt
 
-# Existing calculate_statistics_data function...
+def calculate_statistics_data(amplitude):
+    mean = statistics.mean(amplitude)
+    standard_deviation = statistics.stdev(amplitude)
+    maximum_amplitude = max(amplitude)
+    minimum_amplitude = min(amplitude)
+    return mean, standard_deviation, maximum_amplitude, minimum_amplitude
 
 class GlueWindow(QMainWindow):
     number_of_images = 0
