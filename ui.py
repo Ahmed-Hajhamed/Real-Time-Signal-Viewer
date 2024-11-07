@@ -1,6 +1,6 @@
 import sys
 from graph import Graph, set_icon
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QPushButton)
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QFrame)
 
 
 class MainWindow(QMainWindow):
@@ -54,6 +54,21 @@ class MainWindow(QMainWindow):
         set_icon(self.play_pause_button, "icons/play.png")
         self.play_pause_button.setEnabled(False)
         h_layout_connect_buttons.addWidget(self.play_pause_button)
+
+        self.speed_button= QPushButton("1X")
+        self.speed_button.setEnabled(False)
+        self.speed_button.setStyleSheet(button_style)
+        h_layout_connect_buttons.addWidget(self.speed_button)
+
+        self.view_all_button = QPushButton("View All")
+        self.view_all_button.setStyleSheet(button_style)
+        h_layout_connect_buttons.addWidget(self.view_all_button)
+
+        self.separator = QFrame()
+        self.separator.setFrameShape(QFrame.VLine)
+        self.separator.setFrameShadow(QFrame.Sunken)
+        self.separator.setStyleSheet("QFrame { background-color: #2a9d8f; height: 2px; }")
+        h_layout_connect_buttons.addWidget(self.separator)
 
         self.glue_button = QPushButton("Glue")
         self.glue_button.setStyleSheet(button_style)

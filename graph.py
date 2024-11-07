@@ -419,8 +419,8 @@ class Graph:
 
     def play_pause_signal(self):
         if self.is_paused:
-            if len(self.signals) == 0:
-                self.add_signal("file_of_signal/ECG Signal (Lead V).csv")
+            # if len(self.signals) == 0:
+            #     self.add_signal("file_of_signal/ECG Signal (Lead V).csv")
             self.timer.start()
             set_icon(self.play_pause_button, "icons/pause.png")
         else:
@@ -462,3 +462,17 @@ class Graph:
                 QMessageBox.information(None, 'Item Renamed', f'Item renamed to: {new_name}')
             else:
                 QMessageBox.warning(None, 'Input Error', 'Please enter a valid name.')
+
+    def enabled(self, test):
+        # self.
+        self.speed_button.setEnabled(test)
+        self.zoom_in_button.setEnabled(test)
+        self.zoom_out_button.setEnabled(test)
+        self.off_button.setEnabled(test)
+        self.play_pause_button.setEnabled(test)
+        self.rewind_button.setEnabled(test)
+        self.view_all_button.setEnabled(test)
+        self.off_button.setEnabled(test)
+        self.cine_mode_button.setEnabled(test)
+        self.move_to_another_graph_button.setEnabled(test)
+        self.more_button.setEnabled(test)

@@ -38,6 +38,11 @@ class App(MainWindow):
         self.play_pause_button.clicked.connect(self.play_pause_graphs)
         self.play_pause_button.setEnabled(False)
 
+
+        self.view_all_button.clicked.connect(self.view_all_signals)
+
+        self.speed_button.clicked.connect(self.speed)
+
         self.glue_button.clicked.connect(self.glue_window)
 
         self.open_radar_button.clicked.connect(self.radar_window)
@@ -65,6 +70,9 @@ class App(MainWindow):
             self.graph_2.plot_widget.region.setVisible(False)
 
     def linked_graph(self):
+        if len(self.graph_1.plot_widget.listDataItems()) == 0 or len(self.graph_2.plot_widget.listDataItems()) == 0:
+            QMessageBox.warning(None, "Connect error", "The graphs should be have data")
+            return
         if not self.connected_graphs:
             if self.graph_1.current_index < self.graph_2.current_index:
                 self.graph_2.current_index = self.graph_1.current_index
@@ -72,32 +80,39 @@ class App(MainWindow):
                 self.graph_1.current_index = self.graph_2.current_index
 
             set_icon(self.button_linked_graph, "icons/link.png")
-            self.graph_1.set_plot_limits()
+            self.graph_1.plot_widget.setXLink(self.graph_2.plot_widget)
+            self.graph_1.plot_widget.setYLink(self.graph_2.plot_widget)
             self.graph_2.set_plot_limits()
+            self.graph_1.set_plot_limits()
+            self.speed_button.setText("1x")
+            self.graph_1.speed_button.setText("1x")
+            self.graph_2.speed_button.setText("1x")
+            self.graph_1.current_index_increment=10
+            self.graph_2.current_index_increment = 10
             self.zoom_in_connect_graphs.setEnabled(True)
             self.zoom_out_connect_graphs.setEnabled(True)
             self.play_pause_button.setEnabled(True)
-            self.graph_1.zoom_in_button.setEnabled(False)
-            self.graph_2.zoom_in_button.setEnabled(False)
-            self.graph_1.zoom_out_button.setEnabled(False)
-            self.graph_2.zoom_out_button.setEnabled(False)
-            self.graph_1.play_pause_button.setEnabled(False)
-            self.graph_2.play_pause_button.setEnabled(False)
+            self.speed_button.setEnabled(True)
+            self.graph_1.enabled(False)
+            self.graph_2.enabled(False)
 
         else:
-
             set_icon(self.button_linked_graph, "icons/unlink.png")
+            self.graph_1.plot_widget.setXLink(None)
+            self.graph_1.plot_widget.setYLink(None)
             self.graph_1.set_plot_limits()
             self.graph_2.set_plot_limits()
+            self.speed_button.setText("1x")
+            self.graph_1.speed_button.setText("1x")
+            self.graph_2.speed_button.setText("1x")
+            self.graph_1.current_index_increment=10
+            self.graph_2.current_index_increment = 10
             self.zoom_in_connect_graphs.setEnabled(False)
             self.zoom_out_connect_graphs.setEnabled(False)
             self.play_pause_button.setEnabled(False)
-            self.graph_1.zoom_in_button.setEnabled(True)
-            self.graph_2.zoom_in_button.setEnabled(True)
-            self.graph_1.zoom_out_button.setEnabled(True)
-            self.graph_2.zoom_out_button.setEnabled(True)
-            self.graph_1.play_pause_button.setEnabled(True)
-            self.graph_2.play_pause_button.setEnabled(True)
+            self.speed_button.setEnabled(False)
+            self.graph_1.enabled(True)
+            self.graph_2.enabled(True)
 
         self.connected_graphs = not self.connected_graphs
         self.set()
@@ -140,6 +155,15 @@ class App(MainWindow):
             set_icon(self.play_pause_button, "icons/play.png")
 
         self.connected_graphs_toggle = not self.connected_graphs_toggle
+
+    def speed(self):
+        self.graph_1.speed_signal()
+        self.graph_2.speed_signal()
+        self.speed_button.setText(self.graph_1.speed_button.text())
+
+    def view_all_signals(self):
+        self.graph_2.view_all_signals()
+        self.graph_1.view_all_signals()
 
     def create_pdf(self):
         pdf_filename = QFileDialog.getSaveFileName(self, "Save PDF", "", "PDF Files (*.pdf)")[0]
