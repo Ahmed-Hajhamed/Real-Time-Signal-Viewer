@@ -20,9 +20,10 @@ This application is designed to display and manipulate multiple signals simultan
   </p>
    
 4. **Signal Report Generation:** You can generate a PDF report displaying the meean, duration, minimum, maximum, and standard deviation (std) of the signal.
-   ![PDF Report](assets/pdfTest.png)
-5. **Non-Rectangular Signals:** The application supports non-rectangular signals, such as radar signals, in addition to standard signal types.
-6. **Real-Time Online Signals:** The app can display real-time signals from any API. For example, we have implemented a real-time Bitcoin price display fetched from an online API.
+
+   ![PDF Report](assets/pdf.png)
+6. **Non-Rectangular Signals:** The application supports non-rectangular signals, such as radar signals, in addition to standard signal types.
+7. **Real-Time Online Signals:** The app can display real-time signals from any API. For example, we have implemented a real-time Bitcoin price display fetched from an online API.
 
 
 
