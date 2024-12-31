@@ -1,4 +1,4 @@
-# Signal Display Application
+# Signal Viewer Application
 
 
 ## Overview
