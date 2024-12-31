@@ -15,9 +15,9 @@ def fetch_btc_price():
         url = "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT"
         response = requests.get(url)
         data = response.json()
-        price = data
+        price = data['price']
         print(price)
-        return None
+        return float(price)
     except Exception as e:
         print(f"Error fetching price: {e}")
         return None
