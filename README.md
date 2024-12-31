@@ -33,14 +33,14 @@ This application is designed to display and manipulate multiple signals simultan
    git clone https://github.com/Ahmed-Hajhamed/DSP-Task-1
    ```
 2. Install required dependencies:
-  ```bash
-  pip install -r requirements.txt
-  ```
+   ```bash
+    pip install -r requirements.txt
+   ```
 3. Usage:
 Run Main.py class:
-  ```bash
-  python app.py
-  ```
+   ```bash
+    python app.py
+   ```
 
 ## Usage
 Once the application is launched, you can:
