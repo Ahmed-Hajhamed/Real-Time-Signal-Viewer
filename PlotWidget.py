@@ -14,6 +14,7 @@ class CustomPlotWidget(pg.PlotWidget):
         self.region.setRegion([0, 0])  # Initially set it to 0 width
         self.region.setVisible(False)  # Hide it initially
         self.addItem(self.region)
+        self.setBackground('#2E2E2E')
 
     def set_graph_reference(self, graph):
         """Set a reference to the Graph instance."""

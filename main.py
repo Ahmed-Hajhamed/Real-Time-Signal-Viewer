@@ -52,7 +52,7 @@ class App(MainWindow):
         self.open_online_signal_button.clicked.connect(self.online_signal_window)
 
         self.graph_1.add_signal("file_of_signal/ECG Signal (Lead V).csv")
-        self.graph_2.add_signal("file_of_signal/Pulse Oximeter Signal.csv", "gray")
+        self.graph_2.add_signal("file_of_signal/Pulse Oximeter Signal.csv", "m")
 
     def radar_window(self):
         self.radar_win = SubmarineRadar(self)
