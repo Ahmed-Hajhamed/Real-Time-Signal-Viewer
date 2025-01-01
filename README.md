@@ -1,4 +1,4 @@
-# Signal Viewer Application
+# Real-Time Signal Viewer
 
 
 ## Overview
