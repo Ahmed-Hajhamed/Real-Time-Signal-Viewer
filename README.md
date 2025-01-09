@@ -38,7 +38,7 @@ This application is designed to display and manipulate multiple signals simultan
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Ahmed-Hajhamed/Real-Time-Signal-Viewer
+   git clone https://github.com/Ahmed-Hajhamed/Real-Time-Signal-Viewer.git
    ```
 2. Install required dependencies:
    ```bash
